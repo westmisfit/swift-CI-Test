@@ -2,6 +2,7 @@ language: objective-c
 
 before_script:
     - brew update && brew upgrade xctool
+    - gem install cocoapods
 
 script:
     - xctool -workspace SwiftTravis.xcworkspace -scheme SwiftTravis -sdk iphonesimulator clean build test
