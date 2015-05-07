@@ -4,9 +4,13 @@ before_script:
     - brew update && brew upgrade xctool
     - gem install cocoapods
 
+
+
 script:
     - sh test.sh
     - xctool -workspace SwiftTravis.xcworkspace -scheme SwiftTravis -sdk iphonesimulator clean build test
+
+
 
 branches:
   only:
