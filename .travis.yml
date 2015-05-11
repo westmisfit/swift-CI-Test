@@ -13,8 +13,8 @@ before_script:
     # - echo $TRAVIS_PULL_REQUEST
     # - echo $TRAVIS_OS_NAME
     # - echo $TRAVIS_TAG
-    - pip install requests 
-    - pip install jira
+    - sudo pip install requests 
+    - sudo pip install jira
     - python ci.py $USERNAME $REPONAME $TRAVIS_COMMIT
 
 script:
