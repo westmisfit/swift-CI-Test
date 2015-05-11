@@ -23,7 +23,7 @@ script:
 
 after_script:
     # 
-    - python ci.py $USERNAME $REPONAME $TRAVIS_COMMIT
+    - python ci.py -u=$USERNAME -r=$REPONAME -c=$TRAVIS_COMMIT
     # change status to ToDo
 
 branches:
