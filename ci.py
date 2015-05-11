@@ -201,31 +201,7 @@ if __name__ == "__main__":
 			elif rtype.upper() == "CR":
 				commit_cr(issue_id)
 
-		# CR Test Completed
-		# *********************************************************************************************
-		# ****** We need to change the status "CrTestCompleted" manually without fail test result******
-		# *********************************************************************************************
-		# elif get_current_issue_status(issue_id) == IssueStatus.CrTestCompleted:
-		# 	crTestResult = bdd_test() and unit_test() and device_test()
-		# 	# Test Pass
-		# 	if crTestResult:
-		# 		pass_cr_test(issue_id)
-		# 	# Test Fail
-		# 	else:
-		# 		fix_cr_issue(issue_id)
-
 
 		# CR Fixing
 		elif get_current_issue_status(issue_id) == IssueStatus.CrFixing:
-			commit_issue(issue_id
-
-
-		# SCR Test Completed
-		# *********************************************************************************************
-		# ****** We need to change the status "ScrTestCompleted" manually without fail test result******
-		# *********************************************************************************************
-		# elif get_current_issue_status(issue_id) == IssueStatus.ScrTestCompleted:
-		# 	scrTestResult = bdd_test() and unit_test() and device_test()
-		# 	# Test Fail
-		# 	if not scrTestResult:
-		# 		fail_scr_test(issue_id)
+			commit_issue(issue_id)
