@@ -2,14 +2,18 @@ language: objective-c
 
 before_script:
     - brew update && brew upgrade xctool
-    - gem install cocoapods
-
+#    - gem install cocoapods
+    - echo $TRAVIS_COMMIT
+    - echo $TRAVIS_COMMIT_RANGE
+    - echo $TRAVIS_PULL_REQUEST
+    - echo $TRAVIS_OS_NAME
+    - echo $TRAVIS_TAG
 
 
 script:
-    - sh test.sh
-    - xctool -workspace SwiftTravis.xcworkspace -scheme SwiftTravis -sdk iphonesimulator clean build test
-
+#    - sh test.sh
+#    - xctool -workspace SwiftTravis.xcworkspace -scheme SwiftTravis -sdk iphonesimulator clean build test
+    - echo "script exec"
 
 
 branches:
