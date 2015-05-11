@@ -83,7 +83,7 @@ def unit_test():
 
 def device_test():
 	# 
-	return False
+	return True
 
 
 # **********************************************
