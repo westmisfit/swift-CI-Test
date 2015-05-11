@@ -3,8 +3,8 @@ language: objective-c
 
 env:
     global:
-    - USERNAME = kentzzhang
-    - REPONAME = swift-CI-Test
+    - USERNAME="kentzzhang"
+    - REPONAME="swift-CI-Test"
 
 before_script:
     # - brew update && brew upgrade xctool
@@ -16,8 +16,8 @@ before_script:
     # - echo $TRAVIS_TAG
     - sudo pip install requests 
     - sudo pip install jira
-    - echo "$USERNAME"
-    - echo "$REPONAME"
+    - echo $USERNAME
+    - echo $REPONAME
     - echo $TRAVIS_COMMIT
     - python ci.py $USERNAME $REPONAME $TRAVIS_COMMIT
 
