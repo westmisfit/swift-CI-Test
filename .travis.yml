@@ -10,22 +10,21 @@ before_script:
     # - brew update && brew upgrade xctool
     # - gem install cocoapods
     - echo $TRAVIS_COMMIT
-    # - echo $TRAVIS_COMMIT_RANGE
-    # - echo $TRAVIS_PULL_REQUEST
-    # - echo $TRAVIS_OS_NAME
-    # - echo $TRAVIS_TAG
-    - sudo pip install requests 
-    - sudo pip install jira
-    - echo $USERNAME
-    - echo $REPONAME
-    - echo $TRAVIS_COMMIT
-    - python ci.py $USERNAME $REPONAME $TRAVIS_COMMIT
+    - sudo pip install requests jira
+    # set the status of the JIRA story => building
+    # for example, change status to IN Progress
+    #- python ci.py $USERNAME $REPONAME $TRAVIS_COMMIT
 
 script:
     # - sh test.sh
     # - xctool -workspace SwiftTravis.xcworkspace -scheme SwiftTravis -sdk iphonesimulator clean build test
     - echo "script exec"
 
+
+after_script:
+    # 
+    - python ci.py $USERNAME $REPONAME $TRAVIS_COMMIT
+    # change status to ToDo
 
 branches:
   only:
