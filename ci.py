@@ -229,6 +229,3 @@ if __name__ == "__main__":
 		# 	# Test Fail
 		# 	if not scrTestResult:
 		# 		fail_scr_test(issue_id)
-
-
-
