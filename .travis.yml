@@ -1,18 +1,23 @@
 language: objective-c
 
-before_script:
-    - brew update && brew upgrade xctool
-#    - gem install cocoapods
-    - echo $TRAVIS_COMMIT
-    - echo $TRAVIS_COMMIT_RANGE
-    - echo $TRAVIS_PULL_REQUEST
-    - echo $TRAVIS_OS_NAME
-    - echo $TRAVIS_TAG
+env:
+    - USERNAME = kentzzhang
+    - REPONAME = swift-CI-Test
 
+before_script:
+    # - brew update && brew upgrade xctool
+    # - gem install cocoapods
+    - echo $TRAVIS_COMMIT
+    # - echo $TRAVIS_COMMIT_RANGE
+    # - echo $TRAVIS_PULL_REQUEST
+    # - echo $TRAVIS_OS_NAME
+    # - echo $TRAVIS_TAG
+    - pip install requests jira
+    - python ci.py $USERNAME $REPONAME $TRAVIS_COMMIT
 
 script:
-#    - sh test.sh
-#    - xctool -workspace SwiftTravis.xcworkspace -scheme SwiftTravis -sdk iphonesimulator clean build test
+    # - sh test.sh
+    # - xctool -workspace SwiftTravis.xcworkspace -scheme SwiftTravis -sdk iphonesimulator clean build test
     - echo "script exec"
 
 
