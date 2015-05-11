@@ -2,6 +2,7 @@ sudo: true
 language: objective-c
 
 env:
+    global:
     - USERNAME = kentzzhang
     - REPONAME = swift-CI-Test
 
