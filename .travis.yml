@@ -10,7 +10,7 @@ before_script:
     # - brew update && brew upgrade xctool
     # - gem install cocoapods
     - echo $TRAVIS_COMMIT
-    - sudo pip install requests jira
+    - sudo pip install requests[security] jira
     # set the status of the JIRA story => building
     # for example, change status to IN Progress
     #- python ci.py $USERNAME $REPONAME $TRAVIS_COMMIT
