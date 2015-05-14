@@ -10,7 +10,6 @@ env:
 script:
 - echo "script exec"
 - TESTNAME=`cat test.py`
-- echo $TESTNAME
 #after_script:
 #- python ci.py -u=$USERNAME -r=$REPONAME -c=$TRAVIS_COMMIT
 branches:
@@ -21,5 +20,5 @@ notifications:
     rooms:
           secure: "NAv7ivFWr4wEj5pSjbQpMBC64NLhGyz9KM+Vsavc7zIjJMAoZ2vmodM5woAhFPUL74VximWLVFzsvfW/+3u3jbiS/GTx5Ca7hRBaqeqrFhtwBcuprdvg9qfdJOKtnaQzAz41/NL2SohE5b8GPZXMWgcfcJUG2M975dev12qnHqQ="
     template: 
-    - '%{repository}#%{build_number} <br/> (%{branch} - %{commit} : %{author}): %{message} <br/> (<a href="%{build_url}">Details</a>/<a href="%{compare_url}">Change view</a>)'
+    - '$TESTNAME <br/> %{TESTNAME} <br/> %{repository}#%{build_number} <br/> (%{branch} - %{commit} : %{author}): %{message} <br/> (<a href="%{build_url}">Details</a>/<a href="%{compare_url}">Change view</a>)'
     format: html
