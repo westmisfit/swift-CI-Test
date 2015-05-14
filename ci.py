@@ -2,6 +2,7 @@
 import sys
 import requests
 import argparse
+import time
 from jira import JIRA
 
 JIRA_SERVER = {"server":"https://misfit.jira.com"}
@@ -29,12 +30,9 @@ def change_status(issue_id, action):
 
 def parse_cmt(cmt):
 	# COMMIT_MESSAGE contains:
-	# 1.issueid=****
-	# 2.rtype=CR, values: CR(default value), SCR
-	# 3.msg=****
-	# -----------------------
-	# issue_id=TP-5
-	# msg=testcomment is fine. Let's go
+	# issueid=TP11
+	# rtype=CR, values: CR(default value), SCR
+	# msg=****
 	# -----------------------
 	print "The Commit Commnet are: \n{0}".format(cmt)
 	lines = cmt.split("\n")
@@ -45,46 +43,90 @@ def parse_cmt(cmt):
 
 
 def get_current_issue_status(issue_id):
-	# jira = JIRA(options = JIRA_SERVER, basic_auth = JIRA_AUTH)
-	# issue = jira.issue(issue_id)
-	# # ISSUE STATUS
-	# print issue.id
-	# print issue.key
-	# print issue.fields.status
-	# print issue.fields.progress
-	# jira.add_comment(issue_id, "CUSTOM COMMENT !!!!")
 	jira = JIRA(options = JIRA_SERVER, basic_auth = JIRA_AUTH)
 	issue = jira.issue(issue_id)
 	status = str(issue.fields.status)
-	print "Current Status of the JIRA Issue is {0}".format(status)
+	print "Current Status of the JIRA Issue is : {0}".format(status)
 	return status
+
+
+def test(issue_id):
+	#jira = JIRA(options = JIRA_SERVER, basic_auth = JIRA_AUTH)
+	#issue = jira.issue(issue_id)
+	#issue.update(customfield_12003="http://google.com")
+	#issue.update(customfield_12009={"value":"Failed"})
+	bdd_test(issue_id)
+	ui_check(issue_id)
+	device_test(issue_id)
+
+
+def test_status(testResult):
+	if testResult is None:
+		testStatus = TestResult.NT
+	else:
+		if testResult:
+			testStatus = TestResult.Pass
+		else:
+			testStatus = TestResult.Fail
+	return testStatus
 
 
 # **********************************************
 # Specified Test
 # **********************************************
-def bdd_test():
-	return True
+def bdd_test(issue_id):
+	# CI Test Result
+	#text: customfield_12103
+	#radio: customfield_12007
+	testResult = True
+	jira = JIRA(options = JIRA_SERVER, basic_auth = JIRA_AUTH)
+	issue = jira.issue(issue_id)
+
+	# After Testing, Set the value to the JIRA
+	issue.update(customfield_12103="http://ci.misfit.com/{0}".format(time.time()))
+	issue.update(customfield_12007={"value":test_status(testResult)})
+	return testResult
 
 
-def ui_check():
+def ui_check(issue_id):
 	# Only Add the test result url to the field
+	# UI Check Status
+	#text: customfield_12105
+	#radio: customfield_12009
+	testResult = True
+	jira = JIRA(options = JIRA_SERVER, basic_auth = JIRA_AUTH)
+	issue = jira.issue(issue_id)
+
+	# After Testing, Set the value to the JIRA
+	issue.update(customfield_12105="http://uicheck.misfit.com/{0}".format(time.time()))
+	issue.update(customfield_12009={"value":test_status(testResult)})
+	return testResult
+
+
+def coverage_stat(issue_id):
 	return True
 
 
-def coverage_stat():
+def unit_test(issue_id):
 	return True
 
 
-def unit_test():
-	# 
-	return True
+def device_test(issue_id):
+	# DT Result Status
+	#text: customfield_12104
+	#radio: customfield_12008
+	testResult = True
+	jira = JIRA(options = JIRA_SERVER, basic_auth = JIRA_AUTH)
+	issue = jira.issue(issue_id)
+
+	# After Testing, Set the value to the JIRA
+	issue.update(customfield_12104="http://dt.misfit.com/{0}".format(time.time()))
+	issue.update(customfield_12008={"value":test_status(testResult)})
+	return testResult
 
 
-def device_test():
-	# 
-	return True
-
+def reset(issue_id):
+	pass
 
 # **********************************************
 # Workflow Actions
@@ -93,7 +135,7 @@ def commit_cr(issue_id):
 	# In Progress => CR Test Completed
 	change_status(issue_id, IssueAction.CommitCr)
 	# Begin to test after committing
-	crTestResult = bdd_test() and unit_test() and device_test()
+	crTestResult = bdd_test(issue_id) and ui_check(issue_id) and unit_test(issue_id) and device_test(issue_id)
 	if not crTestResult:
 		# if there is any fail result, go to the issue fixing status
 		fix_cr_issue(issue_id)
@@ -104,7 +146,7 @@ def commit_scr(issue_id):
 	# In Progress => SCR Test Completed
 	change_status(issue_id, IssueAction.CommitScr)
 	# Begin to test after committing
-	scrTestResult = bdd_test() and unit_test() and device_test()
+	scrTestResult = bdd_test(issue_id) and ui_check(issue_id) and unit_test(issue_id) and device_test(issue_id)
 	if not scrTestResult:
 		# if there is any fail result, go to the in progress status
 		fail_scr_test(issue_id)
@@ -135,7 +177,7 @@ def commit_issue(issue_id):
 	# CR Fixing => CR Test Completed
 	change_status(issue_id, IssueAction.CommitIssue)
 	# Begin to test after committing
-	crTestResult = bdd_test() and unit_test() and device_test()
+	crTestResult = bdd_test(issue_id) and ui_check(issue_id) and unit_test(issue_id) and device_test(issue_id)
 	if not crTestResult:
 		# if there is any fail result, go to the issue fixing status
 		fix_cr_issue(issue_id)
@@ -163,7 +205,7 @@ class IssueAction:
 
 # Enum of the Issue Status
 class IssueStatus:
-	ToDo = "ToDo"
+	ToDo = "Open"
 	InProgress = "In Progress"
 	CrTestCompleted = "CR Test Completed"
 	ScrTestCompleted = "SCR Test Completed"
@@ -172,15 +214,23 @@ class IssueStatus:
 	Done = "Done"
 
 
+# Result of the Testing
+class TestResult:
+	Pass = "Passed"
+	Fail = "Failed"
+	NT = "Not Test"
+
+
 if __name__ == "__main__":
 	args = load_args()
 	GIT_COMMIT_URL = "https://api.github.com/repos/{0}/{1}/git/commits/{2}".format(args.username, 
 																				   args.reponame, 
 																				   args.commitid)
-	commit_message = requests.get(GIT_COMMIT_URL).json()["message"]
-	#commit_message = "issueid=TP-10\nrtype=SCR\nmsg=update commit"
+	#commit_message = requests.get(GIT_COMMIT_URL).json()["message"]
+	commit_message = "issueid=TP-19\nrtype=CR\nmsg=update commit"
 	issue_id, rtype, msg = parse_cmt(commit_message)
 
+	#test(issue_id)
 	# if the current status is TODO, then change to In Progress
 	if get_current_issue_status(issue_id) == IssueStatus.ToDo:
 		print "Let's start our story!!"
@@ -190,6 +240,8 @@ if __name__ == "__main__":
 	if args.method is not None:
 		if args.method == "change_status":
 			change_status(issue_id, args.action)
+		elif args.method == "reset":
+			pass
 	else:
 		# In Progress
 		if get_current_issue_status(issue_id) == IssueStatus.InProgress:

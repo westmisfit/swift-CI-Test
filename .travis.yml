@@ -1,25 +1,25 @@
 sudo: true
 language: objective-c
-
 env:
-    global:
-    - USERNAME="kentzzhang"
-    - REPONAME="swift-CI-Test"
-
-before_script:
-    # - brew update && brew upgrade xctool
-    # - gem install cocoapods
-    - sudo pip install requests[security] jira
-
+  global:
+  - USERNAME="kentzzhang"
+  - REPONAME="swift-CI-Test"
+#before_script:
+#- sudo pip install requests[security] jira
 script:
-    # - sh test.sh
-    # - xctool -workspace SwiftTravis.xcworkspace -scheme SwiftTravis -sdk iphonesimulator clean build test
-    - echo "script exec"
-
-
-after_script:
-    - python ci.py -u=$USERNAME -r=$REPONAME -c=$TRAVIS_COMMIT
-
+- echo "script exec"
+#after_script:
+#- python ci.py -u=$USERNAME -r=$REPONAME -c=$TRAVIS_COMMIT
 branches:
   only:
-    - master
+  - master
+notifications:
+  hipchat:
+    rooms:
+    - 7i7HLfO5Wlr2r1ctlm8owTO3ZeIXwxiUTN3sTc7i@TestRoom
+    template:
+    - '%{repository}#%{build_number} (%{branch} - %{commit} : %{author}): %{message} (<a href="%{build_url}">Details</a>/<a href="%{compare_url}">Change view</a>)'
+    format: html
+
+
+
