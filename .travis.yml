@@ -4,10 +4,13 @@ env:
   global:
   - USERNAME="kentzzhang"
   - REPONAME="swift-CI-Test"
+#  - TESTNAME=""
 #before_script:
 #- sudo pip install requests[security] jira
 script:
 - echo "script exec"
+- TESTNAME=`cat test.py`
+- echo $TESTNAME
 #after_script:
 #- python ci.py -u=$USERNAME -r=$REPONAME -c=$TRAVIS_COMMIT
 branches:
