@@ -23,8 +23,8 @@ notifications:
     #- '$USERNAME <br/> ${USERNAME} <br/> %{repository}#%{build_number} <br/> (%{branch} - %{commit} : %{author}): %{message} <br/> (<a href="%{build_url}">Details</a>/<a href="%{compare_url}">Change view</a>)'
     - '${cat test.py}'
     - '$USERNAME'
-    - $USERNAME
-    - '`cat test.py`'
+    - ${USERNAME}
+    - ${cat test.py}
     #- '%{repository}#%{build_number}'
     #- '%{branch} - %{commit} : %{author}): %{message}'
     #- '<a href="%{build_url}">Details</a>/<a href="%{compare_url}">Change view</a>'
