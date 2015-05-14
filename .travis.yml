@@ -16,7 +16,6 @@ branches:
 notifications:
   hipchat:
     rooms:
-    #- 7i7HLfO5Wlr2r1ctlm8owTO3ZeIXwxiUTN3sTc7i@TestRoom
           secure: "NAv7ivFWr4wEj5pSjbQpMBC64NLhGyz9KM+Vsavc7zIjJMAoZ2vmodM5woAhFPUL74VximWLVFzsvfW/+3u3jbiS/GTx5Ca7hRBaqeqrFhtwBcuprdvg9qfdJOKtnaQzAz41/NL2SohE5b8GPZXMWgcfcJUG2M975dev12qnHqQ="
     template: 
     - '%{repository}#%{build_number} <br/> (%{branch} - %{commit} : %{author}): %{message} <br/> (<a href="%{build_url}">Details</a>/<a href="%{compare_url}">Change view</a>)'
