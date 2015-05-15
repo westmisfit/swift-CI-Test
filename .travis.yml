@@ -4,6 +4,9 @@ env:
   global:
   - USERNAME="kentzzhang"
   - REPONAME="swift-CI-Test"
+  - ROOM=TestRoom
+  - HIPCHAT_TOKEN=7i7HLfO5Wlr2r1ctlm8owTO3ZeIXwxiUTN3sTc7i
+
 #  - TESTNAME=""
 #before_script:
 #- sudo pip install requests[security] jira
@@ -17,15 +20,8 @@ branches:
   - master
 notifications:
   hipchat:
-    rooms:
-          secure: "NAv7ivFWr4wEj5pSjbQpMBC64NLhGyz9KM+Vsavc7zIjJMAoZ2vmodM5woAhFPUL74VximWLVFzsvfW/+3u3jbiS/GTx5Ca7hRBaqeqrFhtwBcuprdvg9qfdJOKtnaQzAz41/NL2SohE5b8GPZXMWgcfcJUG2M975dev12qnHqQ="
+    rooms: ${HIPCHAT_TOKEN}@${ROOM}
+          #secure: "NAv7ivFWr4wEj5pSjbQpMBC64NLhGyz9KM+Vsavc7zIjJMAoZ2vmodM5woAhFPUL74VximWLVFzsvfW/+3u3jbiS/GTx5Ca7hRBaqeqrFhtwBcuprdvg9qfdJOKtnaQzAz41/NL2SohE5b8GPZXMWgcfcJUG2M975dev12qnHqQ="
     template: 
-    #- '$USERNAME <br/> ${USERNAME} <br/> %{repository}#%{build_number} <br/> (%{branch} - %{commit} : %{author}): %{message} <br/> (<a href="%{build_url}">Details</a>/<a href="%{compare_url}">Change view</a>)'
-    - '${cat test.py}'
-    - '$USERNAME'
-    - ${USERNAME}
-    - ${cat test.py}
-    #- '%{repository}#%{build_number}'
-    #- '%{branch} - %{commit} : %{author}): %{message}'
-    #- '<a href="%{build_url}">Details</a>/<a href="%{compare_url}">Change view</a>'
-    #format: html
+    - '$USERNAME <br/> ${USERNAME} <br/> %{repository}#%{build_number} <br/> (%{branch} - %{commit} : %{author}): %{message} <br/> (<a href="%{build_url}">Details</a>/<a href="%{compare_url}">Change view</a>)'
+    format: html
