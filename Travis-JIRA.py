@@ -309,10 +309,10 @@ if __name__ == "__main__":
 																				   args.reponame, 
 																				   args.commitid)
 	# Get the commit message from the Github api
-	commit_message = requests.get(GIT_COMMIT_URL).json()["message"]
+	#commit_message = requests.get(GIT_COMMIT_URL).json()["message"]
 
 	# This commit_message is just for Testing without the Travis
-	#commit_message = "issueid=MNP-40\nrtype=none\nmsg=update commit"
+	commit_message = "issueid=MNP-40\nrtype=none\nmsg=update commit"
 	issue_id, rtype, msg = parse_cmt(commit_message)
 
 	#test(issue_id)
