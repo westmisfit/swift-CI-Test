@@ -12,8 +12,9 @@ env:
 #- sudo pip install requests[security] jira
 script:
 - echo "script exec"
-- TESTNAME=`cat test.py`
-#after_script:
+#- TESTNAME=`cat test.py`
+after_script:
+- python Travis-JIRA.py -u=$USERNAME -r=$REPONAME -c=$TRAVIS_COMMIT
 #- python ci.py -u=$USERNAME -r=$REPONAME -c=$TRAVIS_COMMIT
 branches:
   only:
