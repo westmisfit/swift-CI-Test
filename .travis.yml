@@ -8,8 +8,8 @@ env:
   - HIPCHAT_TOKEN=7i7HLfO5Wlr2r1ctlm8owTO3ZeIXwxiUTN3sTc7i
 
 #  - TESTNAME=""
-#before_script:
-#- sudo pip install requests[security] jira
+before_script:
+- sudo pip install requests[security] jira
 script:
 - echo "script exec"
 #- TESTNAME=`cat test.py`
