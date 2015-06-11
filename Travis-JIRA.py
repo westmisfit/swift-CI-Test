@@ -82,6 +82,17 @@ def current_issue_status(issue_id):
 	return status
 
 
+def test_status(testResult):
+	if testResult is None:
+		testStatus = TestResult.NT
+	else:
+		if testResult:
+			testStatus = TestResult.Pass
+		else:
+			testStatus = TestResult.Fail
+	return testStatus
+
+
 # **********************************************
 # Specified Test
 # **********************************************
