@@ -33,12 +33,12 @@ def load_args():
 def parse_cmt(cmt):
 	# -----------------------
 	# COMMIT_MESSAGE contains:
-	# [issue_id=MNP-40][rtype=none][issue_type=trival]update commit msg
+	# [issue_id=MNP-40][rtype=none][issue_priority=trival]update commit msg
 	# -----------------------
 	print "The Commit Commnet are: \n{0}".format(cmt)	
 	reg_issue = r'\[issue_id\=(?P<issue>.+)\]\[rtype'
 	reg_rtype = r'.*issue_id.*\]\[rtype\=(?P<rtype>.+)\]\['
-	reg_issue_type = r'.*rtype.*\]\[issue_type\=(?P<issue_type>.+)\]'
+	reg_issue_type = r'.*rtype.*\]\[issue_priority\=(?P<issue_priority>.+)\]'
 	reg_msg = r'\[.+\]\[.+\](?P<msg>.+)'
 
 	match_issue = re.match(reg_issue, cmt)
@@ -50,16 +50,16 @@ def parse_cmt(cmt):
 	else:
 		rtype = "none"
 
-	match_issue_type = re.match(reg_issue_type, cmt)
-	if match_issue_type:
-		issue_type = match_issue_type.group('issue_type').strip()
+	match_issue_priority = re.match(reg_issue_type, cmt)
+	if match_issue_priority:
+		issue_priority = match_issue_priority.group('issue_priority').strip()
 	else:
-		issue_type = "trival"
+		issue_priority = "trival"
 
 	match_msg = re.match(reg_msg, cmt)
 	msg = match_msg.group('msg').strip()
 
-	return issue_id, rtype, issue_type, msg
+	return issue_id, rtype, issue_priority, msg
 
 
 def change_status(issue_id, action):
@@ -335,11 +335,13 @@ if __name__ == "__main__":
 																				   args.slug.split("/")[1], 
 																				   args.commitid)
 	try:
+		print os.getenv("TRAVIS_REPO_SLUG")
+		print os.getenv("TRAVIS_COMMIT")
 		# Get the commit message from the Github api
 		commit_message = requests.get(GIT_COMMIT_URL).json()["message"]
 
 		# This commit_message is just for Testing without the Travis
-		#commit_message = "[issue_id=MNP-40][rtype=none][issue_type=trival]update commit msg"
+		#commit_message = "[issue_id=MNP-40][rtype=none][issue_priority=trival]update commit msg"
 		issue_id, rtype, issue_type, msg = parse_cmt(commit_message)
 
 		# if the current status is TODO, then change to In Progress
