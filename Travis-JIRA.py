@@ -31,25 +31,36 @@ def load_args():
 def parse_cmt(cmt):
 	# -----------------------
 	# COMMIT_MESSAGE contains:
-	# issueid=TP11
-	# rtype=none, values: CR(default value), SCR
+	# issue_id=TP11
+	# rtype=none
+	# issue_type=trival | serious
 	# msg=****
 	# -----------------------
 	print "The Commit Commnet are: \n{0}".format(cmt)	
-	reg_issue = r'\[issue_id\=(?P<issue>.+)\]\['
-	reg_rtype = r'.*\[rtype\=(?P<type>.+)\]'
+	reg_issue = r'\[issue_id\=(?P<issue>.+)\]\[rtype'
+	reg_rtype = r'.*issue_id.*\]\[rtype\=(?P<rtype>.+)\]\['
+	reg_issue_type = r'.*rtype.*\]\[issue_type\=(?P<issue_type>.+)\]'
 	reg_msg = r'\[.+\]\[.+\](?P<msg>.+)'
 
 	match_issue = re.match(reg_issue, cmt)
-	issue_id = match_issue.group('issue')
+	issue_id = match_issue.group('issue').strip()
 
 	match_rtype = re.match(reg_rtype, cmt)
-	rtype = match_rtype.group('type')
+	if match_rtype:
+		rtype = match_rtype.group('rtype').strip()
+	else:
+		rtype = "none"
+
+	match_issue_type = re.match(reg_rtype, cmt)
+	if match_issue_type:
+		issue_type = match_issue_type.group('issue_type').strip()
+	else:
+		issue_type = "trival"
 
 	match_msg = re.match(reg_msg, cmt)
-	msg = match_msg.group('msg')
+	msg = match_msg.group('msg').strip()
 
-	return issue_id, rtype, msg
+	return issue_id, rtype, issue_type, msg
 
 
 def change_status(issue_id, action):
@@ -69,17 +80,6 @@ def current_issue_status(issue_id):
 	status = str(issue.fields.status)
 	print "Current Status of the JIRA Issue is : {0}".format(status)
 	return status
-
-
-def test_status(testResult):
-	if testResult is None:
-		testStatus = TestResult.NT
-	else:
-		if testResult:
-			testStatus = TestResult.Pass
-		else:
-			testStatus = TestResult.Fail
-	return testStatus
 
 
 # **********************************************
@@ -328,10 +328,9 @@ if __name__ == "__main__":
 	commit_message = requests.get(GIT_COMMIT_URL).json()["message"]
 
 	# This commit_message is just for Testing without the Travis
-	#commit_message = "issueid=MNP-47|rtype=none|msg=update commit"
-	issue_id, rtype, msg = parse_cmt(commit_message)
+	#commit_message = "[issueid=MNP-40][rtype=none][issue_type=trival]msg=update commit"
+	issue_id, rtype, issue_type, msg = parse_cmt(commit_message)
 
-	#test(issue_id)
 	#try:
 	# if the current status is TODO, then change to In Progress
 	if current_issue_status(issue_id) == IssueStatus.ToDo:
@@ -365,14 +364,14 @@ if __name__ == "__main__":
 	 		merge_story(issue_id)
 	 	elif status == IssueStatus.AutoTestFailed:
 	 		# Big Issue
-	 		if False:
+	 		if issue_type.lower() == "serious":
 	 			fix_issue(issue_id)
 	 		# normal issue
 	 		else:
 	 			fix_small_issue(issue_id)
 	 	elif status == IssueStatus.SmokeTestFailed:
 	 		# Big Issue
-	 		if True:
+	 		if issue_type.lower() == "serious":
 	 			fix_issue(issue_id)
 	 		else:
 	 			fix_small_issue(issue_id)
