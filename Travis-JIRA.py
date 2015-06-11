@@ -1,11 +1,13 @@
 #encoding:utf-8
 import sys
+import os
 import requests
 import argparse
 import time
 from jira import JIRA
 import traceback
 import re
+import json
 
 JIRA_SERVER = {"server":"https://misfit.jira.com"}
 JIRA_AUTH = ("kentz", "1qaz2wsx")
@@ -15,26 +17,25 @@ HIPCHAT_TOKEN = "7i7HLfO5Wlr2r1ctlm8owTO3ZeIXwxiUTN3sTc7i"
 
 def send_hipchat_msg(msg):
 	hipchat_url = "https://api.hipchat.com/v2/room/{0}/notification?auth_token={1}".format(ROOM, HIPCHAT_TOKEN)
+	msg = "Travis Integrate to JIRA Error occurs! \n" + msg
 	data = json.dumps({"message_format":"text", "message": msg})
 	return "curl -H \"Content-Type: application/json\" -X POST -d '{0}' {1}".format(data, hipchat_url)
 
 
 def load_args():
 	parser = argparse.ArgumentParser()
-	parser.add_argument("-u", "--username")
-	parser.add_argument("-r", "--reponame")
+	# parser.add_argument("-u", "--username") # username or the organization name
+	# parser.add_argument("-r", "--reponame") # repo name
+	parser.add_argument("-s", "--slug")
 	parser.add_argument("-c", "--commitid")
 	parser.add_argument("-m", "--method")
-	parser.add_argument("-s", "--action") # method=change_status, then you need to input the status you want to change to.
+	parser.add_argument("-a", "--action") # method=change_status, then you need to input the status you want to change to.
 	return parser.parse_args()
 
 def parse_cmt(cmt):
 	# -----------------------
 	# COMMIT_MESSAGE contains:
-	# issue_id=TP11
-	# rtype=none
-	# issue_type=trival | serious
-	# msg=****
+	# [issue_id=MNP-40][rtype=none][issue_type=trival]update commit msg
 	# -----------------------
 	print "The Commit Commnet are: \n{0}".format(cmt)	
 	reg_issue = r'\[issue_id\=(?P<issue>.+)\]\[rtype'
@@ -332,61 +333,61 @@ class TestResult:
 
 if __name__ == "__main__":
 	args = load_args()
-	GIT_COMMIT_URL = "https://api.github.com/repos/{0}/{1}/git/commits/{2}".format(args.username, 
-																				   args.reponame, 
+	GIT_COMMIT_URL = "https://api.github.com/repos/{0}/{1}/git/commits/{2}".format(args.slug.split("/")[0], 
+																				   args.slug.split("/")[1], 
 																				   args.commitid)
-	# Get the commit message from the Github api
-	commit_message = requests.get(GIT_COMMIT_URL).json()["message"]
+	try:
+		# Get the commit message from the Github api
+		commit_message = requests.get(GIT_COMMIT_URL).json()["message"]
 
-	# This commit_message is just for Testing without the Travis
-	#commit_message = "[issue_id=MNP-40][rtype=none][issue_type=trival]msg=update commit"
-	issue_id, rtype, issue_type, msg = parse_cmt(commit_message)
+		# This commit_message is just for Testing without the Travis
+		#commit_message = "[issue_id=MNP-40][rtype=none][issue_type=trival]update commit msg"
+		issue_id, rtype, issue_type, msg = parse_cmt(commit_message)
 
-	#try:
-	# if the current status is TODO, then change to In Progress
-	if current_issue_status(issue_id) == IssueStatus.ToDo:
-	 	print "Let's start our story!!"
-	 	change_status(issue_id, IssueAction.implement)
+		# if the current status is TODO, then change to In Progress
+		if current_issue_status(issue_id) == IssueStatus.ToDo:
+		 	print "Let's start our story!!"
+		 	change_status(issue_id, IssueAction.implement)
 
-	# # Change the status of the JIRA issue
-	if args.method is not None:
-		if args.method == "change_status":
-			change_status(issue_id, args.action)
-		elif args.method == "reset":
-			pass
-	else:
-		status = current_issue_status(issue_id)
-	 	# In Progress
-	 	if status == IssueStatus.InProgress:
-	 		submit_code(issue_id)
-	 	# CI Test Fail
-	 	elif status == IssueStatus.CiFailed:
-	 		re_implement(issue_id)
-	 	# CI Test Pass
-	 	elif status == IssueStatus.CiPassed:
-	 		if rtype.lower() == "none":
-	 			continue_develop_story(issue_id)
-	 		else:
-	 			submit_code_review(issue_id)
-	 	# SCR Failed
-	 	elif status == IssueStatus.ScrFailed:
-	 		fix_issue(issue_id)
-	 	elif status == IssueStatus.ScrPassed:
-	 		merge_story(issue_id)
-	 	elif status == IssueStatus.AutoTestFailed:
-	 		# Big Issue
-	 		if issue_type.lower() == "serious":
-	 			fix_issue(issue_id)
-	 		# normal issue
-	 		else:
-	 			fix_small_issue(issue_id)
-	 	elif status == IssueStatus.SmokeTestFailed:
-	 		# Big Issue
-	 		if issue_type.lower() == "serious":
-	 			fix_issue(issue_id)
-	 		else:
-	 			fix_small_issue(issue_id)
-	# except Exception,e:
-	# 	send_hipchat_msg(traceback.format_exc())
+		# # # Change the status of the JIRA issue
+		if args.method is not None:
+			if args.method == "change_status":
+				change_status(issue_id, args.action)
+			elif args.method == "reset":
+				pass
+		else:
+			status = current_issue_status(issue_id)
+		 	# In Progress
+		 	if status == IssueStatus.InProgress:
+		 		submit_code(issue_id)
+		 	# CI Test Fail
+		 	elif status == IssueStatus.CiFailed:
+		 		re_implement(issue_id)
+		 	# CI Test Pass
+		 	elif status == IssueStatus.CiPassed:
+		 		if rtype.lower() == "none":
+		 			continue_develop_story(issue_id)
+		 		else:
+		 			submit_code_review(issue_id)
+		 	# SCR Failed
+		 	elif status == IssueStatus.ScrFailed:
+		 		fix_issue(issue_id)
+		 	elif status == IssueStatus.ScrPassed:
+		 		merge_story(issue_id)
+		 	elif status == IssueStatus.AutoTestFailed:
+		 		# Big Issue
+		 		if issue_type.lower() == "serious":
+		 			fix_issue(issue_id)
+		 		# normal issue
+		 		else:
+		 			fix_small_issue(issue_id)
+		 	elif status == IssueStatus.SmokeTestFailed:
+		 		# Big Issue
+		 		if issue_type.lower() == "serious":
+		 			fix_issue(issue_id)
+		 		else:
+		 			fix_small_issue(issue_id)
+	except Exception,e:
+	 	os.system(send_hipchat_msg(traceback.format_exc()))
 
 
