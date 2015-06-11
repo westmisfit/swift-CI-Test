@@ -40,13 +40,13 @@ def parse_cmt(cmt):
 	reg_rtype = r'.*\[rtype\=(?P<type>.+)\]'
 	reg_msg = r'\[.+\]\[.+\](?P<msg>.+)'
 
-	match_issue = re.match(reg_issue, msg)
+	match_issue = re.match(reg_issue, cmt)
 	issue_id = match_issue.group('issue')
 
-	match_rtype = re.match(reg_rtype, msg)
+	match_rtype = re.match(reg_rtype, cmt)
 	rtype = match_rtype.group('type')
 
-	match_msg = re.match(reg_msg, msg)
+	match_msg = re.match(reg_msg, cmt)
 	msg = match_msg.group('msg')
 
 	return issue_id, rtype, msg
