@@ -24,8 +24,6 @@ def send_hipchat_msg(msg):
 
 def load_args():
 	parser = argparse.ArgumentParser()
-	# parser.add_argument("-u", "--username") # username or the organization name
-	# parser.add_argument("-r", "--reponame") # repo name
 	parser.add_argument("-s", "--slug")
 	parser.add_argument("-c", "--commitid")
 	parser.add_argument("-m", "--method")
