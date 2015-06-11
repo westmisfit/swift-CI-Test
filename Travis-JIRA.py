@@ -339,7 +339,7 @@ if __name__ == "__main__":
 	commit_message = requests.get(GIT_COMMIT_URL).json()["message"]
 
 	# This commit_message is just for Testing without the Travis
-	#commit_message = "[issueid=MNP-40][rtype=none][issue_type=trival]msg=update commit"
+	#commit_message = "[issue_id=MNP-40][rtype=none][issue_type=trival]msg=update commit"
 	issue_id, rtype, issue_type, msg = parse_cmt(commit_message)
 
 	#try:
