@@ -35,21 +35,26 @@ def parse_cmt(cmt):
 	# msg=****
 	# -----------------------
 	print "The Commit Commnet are: \n{0}".format(cmt)
-	lines = cmt.split("\n")
-	issue_id = lines[0][lines[0].index("=")+1:]
-	rtype = lines[1][lines[1].index("=")+1:]
-	msg = lines[2][lines[2].index("=")+1:]
+	if "|" in cmt:
+		flag = "|"
+	else:
+		flag = "\n"
+	lines = cmt.split(flag)
+	print lines
+	issue_id = lines[0][lines[0].index("=")+1:].strip()
+	rtype = lines[1][lines[1].index("=")+1:].strip()
+	msg = lines[2][lines[2].index("=")+1:].strip()
 	return issue_id, rtype, msg
 
 
 def change_status(issue_id, action):
 	# Trigger the issue to performe the Action in order to change the status
-	print "Change the Issue: {0} status. Action: {1}".format(issue_id, action)
 	jira = JIRA(options = JIRA_SERVER, basic_auth = JIRA_AUTH)
 	issue = jira.issue(issue_id)
 	transitions = jira.transitions(issue)
 	t_dict = {t['name']:t['id'] for t in transitions} 
 	print "Optional Action: {0}".format(t_dict)
+	print "Change the Issue: {0} status. Action: {1}".format(issue_id, action)
 	jira.transition_issue(issue, t_dict[action])
 
 
@@ -79,7 +84,7 @@ def bdd_test(issue_id):
 	# CI Test Result
 	#text: customfield_12103
 	#radio: customfield_12007
-	testResult = False
+	testResult = True
 	jira = JIRA(options = JIRA_SERVER, basic_auth = JIRA_AUTH)
 	issue = jira.issue(issue_id)
 	
@@ -88,7 +93,8 @@ def bdd_test(issue_id):
 	# -----------------------------------
 
 	# After Testing, Set the value to the JIRA
-	issue.update(customfield_12103="http://ci.misfit.com/{0}".format(time.time()))
+	#issue.update(customfield_12103="http://ci.misfit.com/{0}".format(time.time()))
+	issue.update(customfield_12103="No Test Report Now")
 	issue.update(customfield_12007={"value":test_status(testResult)})
 	return testResult
 
@@ -107,7 +113,8 @@ def ui_check(issue_id):
 	# -----------------------------------
 
 	# After Testing, Set the value to the JIRA
-	issue.update(customfield_12105="http://uicheck.misfit.com/{0}".format(time.time()))
+	#issue.update(customfield_12105="http://uicheck.misfit.com/{0}".format(time.time()))
+	issue.update(customfield_12105="No Test Report Now")
 	issue.update(customfield_12009={"value":test_status(testResult)})
 	return testResult
 
@@ -139,7 +146,8 @@ def device_test(issue_id):
 	# -----------------------------------
 
 	# After Testing, Set the value to the JIRA
-	issue.update(customfield_12104="http://dt.misfit.com/{0}".format(time.time()))
+	#issue.update(customfield_12104="http://dt.misfit.com/{0}".format(time.time()))
+	issue.update(customfield_12104="No Test Report Now")
 	issue.update(customfield_12008={"value":test_status(testResult)})
 	return testResult
 
@@ -164,8 +172,8 @@ def submit_code(issue_id):
 		# CI Test Fail
 		bdd_test_fail(issue_id)
 	else:
-		# Need to change the status manually after checking the report 
-		pass
+		# CI Test Pass
+		bdd_test_pass(issue_id)
 
 
 def re_implement(issue_id):
@@ -175,15 +183,17 @@ def re_implement(issue_id):
 	submit_code(issue_id)
 
 
-# BDD Test Fail => CI Test Fail
+# BDD Test Fail == CI Test Fail
 def bdd_test_fail(issue_id):
 	# Code Submitted => CI Test Fail
 	change_status(issue_id, IssueAction.bdd_test_fail)
 
 
-# BDD Test Pass => CI Test Pass
-def bdd_test_pass():
-	pass
+# BDD Test Pass == CI Test Pass
+def bdd_test_pass(issue_id):
+	# Code Submitted => CI Passed
+	change_status(issue_id, IssueAction.bdd_test_pass)
+
 
 
 def continue_develop_story(issue_id):
@@ -214,7 +224,7 @@ def merge_story(issue_id):
 	if not auto_test_result:
 		auto_test_fail(issue_id)
 	else:
-		pass
+		auto_test_pass(issue_id)
 
 
 def auto_test_fail(issue_id):
@@ -223,7 +233,8 @@ def auto_test_fail(issue_id):
 
 
 def auto_test_pass(issue_id):
-	pass
+	# Story Merged => CI Passed
+	change_status(issue_id, IssueAction.auto_test_pass)
 
 
 def fix_issue(issue_id):
@@ -242,7 +253,7 @@ def fix_small_issue(issue_id):
 	if not auto_test_result:
 		auto_test_fail(issue_id)
 	else:
-		pass
+		auto_test_pass(issue_id)
 
 
 def smoke_test_fail():
@@ -309,58 +320,58 @@ if __name__ == "__main__":
 																				   args.reponame, 
 																				   args.commitid)
 	# Get the commit message from the Github api
-	#commit_message = requests.get(GIT_COMMIT_URL).json()["message"]
+	commit_message = requests.get(GIT_COMMIT_URL).json()["message"]
 
 	# This commit_message is just for Testing without the Travis
-	commit_message = "issueid=MNP-40\nrtype=none\nmsg=update commit"
+	#commit_message = "issueid=MNP-47|rtype=none|msg=update commit"
 	issue_id, rtype, msg = parse_cmt(commit_message)
 
 	#test(issue_id)
-	try:
-		# if the current status is TODO, then change to In Progress
-		if current_issue_status(issue_id) == IssueStatus.ToDo:
-		 	print "Let's start our story!!"
-		 	change_status(issue_id, IssueAction.implement)
+	#try:
+	# if the current status is TODO, then change to In Progress
+	if current_issue_status(issue_id) == IssueStatus.ToDo:
+	 	print "Let's start our story!!"
+	 	change_status(issue_id, IssueAction.implement)
 
-		# # Change the status of the JIRA issue
-		if args.method is not None:
-			if args.method == "change_status":
-				change_status(issue_id, args.action)
-			elif args.method == "reset":
-				pass
-		else:
-			status = current_issue_status(issue_id)
-		 	# In Progress
-		 	if status == IssueStatus.InProgress:
-		 		submit_code(issue_id)
-		 	# CI Test Fail
-		 	elif status == IssueStatus.CiFailed:
-		 		re_implement(issue_id)
-		 	# CI Test Pass
-		 	elif status == IssueStatus.CiPassed:
-		 		if rtype.lower() == "none":
-		 			continue_develop_story(issue_id)
-		 		else:
-		 			submit_code_review(issue_id)
-		 	# SCR Failed
-		 	elif status == IssueStatus.ScrFailed:
-		 		fix_issue(issue_id)
-		 	elif status == IssueStatus.ScrPassed:
-		 		merge_story(issue_id)
-		 	elif status == IssueStatus.AutoTestFailed:
-		 		# Big Issue
-		 		if False:
-		 			fix_issue(issue_id)
-		 		# normal issue
-		 		else:
-		 			fix_small_issue(issue_id)
-		 	elif status == IssueStatus.SmokeTestFailed:
-		 		# Big Issue
-		 		if True:
-		 			fix_issue(issue_id)
-		 		else:
-		 			fix_small_issue(issue_id)
-	except Exception,e:
-		send_hipchat_msg(traceback.format_exc())
+	# # Change the status of the JIRA issue
+	if args.method is not None:
+		if args.method == "change_status":
+			change_status(issue_id, args.action)
+		elif args.method == "reset":
+			pass
+	else:
+		status = current_issue_status(issue_id)
+	 	# In Progress
+	 	if status == IssueStatus.InProgress:
+	 		submit_code(issue_id)
+	 	# CI Test Fail
+	 	elif status == IssueStatus.CiFailed:
+	 		re_implement(issue_id)
+	 	# CI Test Pass
+	 	elif status == IssueStatus.CiPassed:
+	 		if rtype.lower() == "none":
+	 			continue_develop_story(issue_id)
+	 		else:
+	 			submit_code_review(issue_id)
+	 	# SCR Failed
+	 	elif status == IssueStatus.ScrFailed:
+	 		fix_issue(issue_id)
+	 	elif status == IssueStatus.ScrPassed:
+	 		merge_story(issue_id)
+	 	elif status == IssueStatus.AutoTestFailed:
+	 		# Big Issue
+	 		if False:
+	 			fix_issue(issue_id)
+	 		# normal issue
+	 		else:
+	 			fix_small_issue(issue_id)
+	 	elif status == IssueStatus.SmokeTestFailed:
+	 		# Big Issue
+	 		if True:
+	 			fix_issue(issue_id)
+	 		else:
+	 			fix_small_issue(issue_id)
+	# except Exception,e:
+	# 	send_hipchat_msg(traceback.format_exc())
 
 
