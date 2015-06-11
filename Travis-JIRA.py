@@ -51,7 +51,7 @@ def parse_cmt(cmt):
 	else:
 		rtype = "none"
 
-	match_issue_type = re.match(reg_rtype, cmt)
+	match_issue_type = re.match(reg_issue_type, cmt)
 	if match_issue_type:
 		issue_type = match_issue_type.group('issue_type').strip()
 	else:
