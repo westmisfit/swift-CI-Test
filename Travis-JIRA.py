@@ -24,8 +24,6 @@ def send_hipchat_msg(msg):
 
 def load_args():
 	parser = argparse.ArgumentParser()
-	parser.add_argument("-s", "--slug")
-	parser.add_argument("-c", "--commitid")
 	parser.add_argument("-m", "--method")
 	parser.add_argument("-a", "--action") # method=change_status, then you need to input the status you want to change to.
 	return parser.parse_args()
@@ -331,12 +329,12 @@ class TestResult:
 
 if __name__ == "__main__":
 	args = load_args()
-	GIT_COMMIT_URL = "https://api.github.com/repos/{0}/{1}/git/commits/{2}".format(args.slug.split("/")[0], 
-																				   args.slug.split("/")[1], 
-																				   args.commitid)
+	slug = os.getenv("TRAVIS_REPO_SLUG")
+	commitid = os.getenv("TRAVIS_COMMIT")
+	GIT_COMMIT_URL = "https://api.github.com/repos/{0}/{1}/git/commits/{2}".format(slug.split("/")[0], 
+																				   slug.split("/")[1], 
+																				   commitid)
 	try:
-		print os.getenv("TRAVIS_REPO_SLUG")
-		print os.getenv("TRAVIS_COMMIT")
 		# Get the commit message from the Github api
 		commit_message = requests.get(GIT_COMMIT_URL).json()["message"]
 

@@ -13,7 +13,7 @@ script:
 - echo "script exec"
 
 after_script:
-- python Travis-JIRA.py -s=$TRAVIS_REPO_SLUG -c=$TRAVIS_COMMIT
+- python Travis-JIRA.py
 
 branches:
   only:
