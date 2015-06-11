@@ -5,6 +5,7 @@ import argparse
 import time
 from jira import JIRA
 import traceback
+import re
 
 JIRA_SERVER = {"server":"https://misfit.jira.com"}
 JIRA_AUTH = ("kentz", "1qaz2wsx")
@@ -31,19 +32,23 @@ def parse_cmt(cmt):
 	# -----------------------
 	# COMMIT_MESSAGE contains:
 	# issueid=TP11
-	# rtype=CR, values: CR(default value), SCR
+	# rtype=none, values: CR(default value), SCR
 	# msg=****
 	# -----------------------
-	print "The Commit Commnet are: \n{0}".format(cmt)
-	if "|" in cmt:
-		flag = "|"
-	else:
-		flag = "\n"
-	lines = cmt.split(flag)
-	print lines
-	issue_id = lines[0][lines[0].index("=")+1:].strip()
-	rtype = lines[1][lines[1].index("=")+1:].strip()
-	msg = lines[2][lines[2].index("=")+1:].strip()
+	print "The Commit Commnet are: \n{0}".format(cmt)	
+	reg_issue = r'\[issue_id\=(?P<issue>.+)\]\['
+	reg_rtype = r'.*\[rtype\=(?P<type>.+)\]'
+	reg_msg = r'\[.+\]\[.+\](?P<msg>.+)'
+
+	match_issue = re.match(reg_issue, msg)
+	issue_id = match_issue.group('issue')
+
+	match_rtype = re.match(reg_rtype, msg)
+	rtype = match_rtype.group('type')
+
+	match_msg = re.match(reg_msg, msg)
+	msg = match_msg.group('msg')
+
 	return issue_id, rtype, msg
 
 
