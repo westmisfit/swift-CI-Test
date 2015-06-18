@@ -1,27 +1,22 @@
 sudo: true
 language: objective-c
 
-env:
-  global:
-  - ROOM=TestRoom
-  - HIPCHAT_TOKEN=7i7HLfO5Wlr2r1ctlm8owTO3ZeIXwxiUTN3sTc7i
-
 before_script:
-- sudo pip install requests[security] jira
+  - pip install travis-jira
 
 script:
-- echo "script exec"
+  - echo "script exec"
 
 after_script:
-- python Travis-JIRA.py
+  - travis-jira
 
 branches:
   only:
-  - master
+    - master
 
 notifications:
   hipchat:
-    rooms: 7i7HLfO5Wlr2r1ctlm8owTO3ZeIXwxiUTN3sTc7i@TestRoom
+    rooms: UGaG7cX6EtZue90iFpTsx4Hq8rgr33AtxgluU7GV@1467331
     template: 
-    - '%{repository}#%{build_number} <br/> (%{branch} - %{commit} : %{author}): %{message} <br/> (<a href="%{build_url}">Details</a>/<a href="%{compare_url}">Change view</a>)'
+      - '%{repository}#%{build_number} <br/> (%{branch} - %{commit} : %{author}): %{message} <br/> (<a href="%{build_url}">Details</a>/<a href="%{compare_url}">Change view</a>)'
     format: html
